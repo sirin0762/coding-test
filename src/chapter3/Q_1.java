@@ -1,7 +1,7 @@
 package chapter3;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class Q_1 {
@@ -12,22 +12,17 @@ public class Q_1 {
     // 3. 교점 중, 가장 위, 아래, 좌, 우 의 교점의 좌표를 찾는다.
     // 4. 해당 교점의 좌표를 통해 *와 .을 출력한다.
 
-    public List<Node> intersectionPoints = new ArrayList<>();
-    public int up = -100_000;
-    public int down = 100_000;
-    public int right = -100_000;
-    public int left = 100_000;
 
     public static void main(String[] args) {
         Q_1 q1 = new Q_1();
         int[][] line = {
-//            {2, -1, 4},
-//            {-2, -1, 4},
-//            {0, -1, 1},
-//            {5, -8, -12},
-//            {5, 8, 12}
+            {2, -1, 4},
+            {-2, -1, 4},
+            {0, -1, 1},
+            {5, -8, -12},
+            {5, 8, 12}
 
-            {0, 1, -1},{1, 0, -1},{1, 0, 1}
+//            {0, 1, -1},{1, 0, -1},{1, 0, 1}
         };
         String[] solution = q1.solution(line);
         System.out.println(solution);
@@ -35,76 +30,85 @@ public class Q_1 {
     }
 
     public String[] solution(int[][] line) {
+        List<Point> points = new ArrayList<>();
         for (int i = 0; i < line.length; i++) {
-            int[] line1 = line[i];
-            for (int j = 0; j < i + 1; j++) {
-                int[] line2 = line[j];
-                if (!isParallel(line1, line2) && haveIntegerIntersection(line1, line2)) intersectionPoints.add(getIntersectionPoint(line1, line2));
+            for (int j = i + 1; j < line.length; j++) {
+                Point intersection = intersection(line[i][0], line[i][1], line[i][2], line[j][0], line[j][1], line[j][2]);
+
+                if (intersection != null) {
+                    points.add(intersection);
+                }
             }
         }
-        return printRectagular();
-    }
 
-    private String[] printRectagular() {
-        int row = up - down + 1;
-        int col = right - left + 1;
+        Point max = getMaximunPoint(points);
+        Point min = getMinimumPoint(points);
 
-        List<StringBuilder> stringBuilders = new ArrayList<>();
-        for (int i = 0; i < row; i++) {
-            stringBuilders.add(new StringBuilder(".".repeat(col)));
+        int width = (int) (max.x - min.x + 1);
+        int height = (int) (max.y - min.y + 1);
+
+        char[][] arr = new char[height][width];
+
+        for (char[] row: arr) {
+            Arrays.fill(row, '.');
         }
-        Node center = new Node((col - 1) / 2, (row - 1) / 2);
-        for (Node node: intersectionPoints) {
-            stringBuilders.get(center.y + node.y).setCharAt(center.x + node.x, '*');
+
+        for (Point p: points) {
+            int x = (int) (p.x - min.x);
+            int y = (int) (max.y - p.y);
+            arr[y][x] = '*';
         }
-        Collections.reverse(stringBuilders);
-        return stringBuilders.stream().map(String::new).toArray(String[]::new);
+
+        String[] result = new String[arr.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = new String(arr[i]);
+        }
+        return result;
     }
 
-    private boolean haveIntegerIntersection(int[] line1, int[] line2) {
-        int A = line1[0];
-        int B = line1[1];
-        int E = line1[2];
-        int C = line2[0];
-        int D = line2[1];
-        int F = line2[2];
+    private Point getMinimumPoint(List<Point> points) {
+        long x = Long.MAX_VALUE;
+        long y = Long.MAX_VALUE;
 
-        double x = (double) (B * F - E * D) / (A * D - B * C);
-        double y = (double) (E * C - A * F) / (A * D - B * C);
-        int x1 = (B * F - E * D) / (A * D - B * C);
-        int y1 = (E * C - A * F) / (A * D - B * C);
+        for (Point point: points) {
+            x = Long.min(x, point.x);
+            y = Long.min(y, point.y);
+        }
 
-        return x == x1 && y == y1;
+        return new Point(x, y);
     }
 
-    private Node getIntersectionPoint(int[] line1, int[] line2) {
-        int A = line1[0];
-        int B = line1[1];
-        int E = line1[2];
-        int C = line2[0];
-        int D = line2[1];
-        int F = line2[2];
 
-        int x = (B * F - E * D) / (A * D - B * C);
-        int y = (E * C - A * F) / (A * D - B * C);
+    private Point getMaximunPoint(List<Point> points) {
+        long x = Long.MIN_VALUE;
+        long y = Long.MIN_VALUE;
 
-        up = Integer.max(up, y);
-        down = Integer.min(down, y);
-        right = Integer.max(right, x);
-        left = Integer.min(left, x);
+        for (Point point: points) {
+            x = Long.max(x, point.x);
+            y = Long.max(y, point.y);
+        }
 
-        return new Node(x, y);
+        return new Point(x, y);
     }
 
-    private boolean isParallel(int[] line1, int[] line2) {
-        int A = line1[0];
-        int B = line1[1];
-        int C = line2[0];
-        int D = line2[1];
-        return (A * D - B * C) == 0;
+    private Point intersection(long a1, long b1, long c1, long a2, long b2, long c2) {
+        double x = (double) (b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
+        double y = (double) (a2 * c1 - a1 * c2) / (a1 * b2 - a2 * b1);
+
+        if (x % 1 != 0 || y % 1 != 0) return null;
+
+        return new Point((long) x, (long) y);
     }
 
-    private
+    private static class Point {
+
+        public final long x, y;
+
+        public Point(long x, long y) {
+            this.x = x;
+            this.y = y;
+        }
+
+    }
 
 }
-
