@@ -52,22 +52,23 @@ public class Q_3 {
             if (nx < 0 || ny < 0 || nx >= place[0].length || ny >= place.length) continue;
 
             if (place[ny][nx] == 'P') return false;
-            if (place[ny][nx] == 'O') return checkNextPos(place, nx, ny, x, y);
+            if (place[ny][nx] == 'O') return checkNextPos(place, nx, ny, 3 - i);
         }
         return true;
     }
 
-    private boolean checkNextPos(char[][] place, int x, int y, int px, int py) {
+    private boolean checkNextPos(char[][] place, int x, int y, int exclude) {
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
 
         for (int i = 0; i < 4; i++) {
+            if (i == exclude) continue;
             int nx = x + dx[i];
             int ny = y + dy[i];
 
             if (nx < 0 || ny < 0 || nx >= place[0].length || ny >= place.length) continue;
 
-            if (place[ny][nx] == 'P' && nx != px && ny != py) return false;
+            if (place[ny][nx] == 'P') return false;
         }
         return true;
     }
