@@ -22,7 +22,7 @@ public class Q_5 {
     // 2. 그게 아니면 일단은 탐색, 이걸로 완탐
     public int solution(int[] info, int[][] edges) {
         Node[] nodes = new Node[info.length];
-        visited = new boolean[info.length];
+
         for (int i = 0; i < info.length; i++) {
             nodes[i] = new Node(i, info[i]);
         }
@@ -60,8 +60,6 @@ public class Q_5 {
 
         dfsLeft(nodes, nodes[start].left.number, list);
         dfsLeft(nodes, nodes[start].right.number, list);
-
-        if (nodes[start].animalType == 1)
     }
 
     private void dfsRight(Node[] nodes, int start, List<Node> list) {
