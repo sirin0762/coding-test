@@ -1,71 +1,66 @@
 package BOJ;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
 
 public class BOJ1041 {
 
-    // n이 1 -> 6개의 경우의 수 중에 가장 작은 것
-    // n이 2 -> 마주보는 2개의 면 중에 최솟값 & 마주보는 3개의 면 중에 최솟값
-    // n이 3이상이면 -> 최소면 1개 + 최소면 2개 + 최소면 3개
+    static long N;
+    static int[] arr = new int[6];
+    static long[] num = new long[4];
+    static long res;
 
-    static List<String> twoPlane = List.of("AB", "AC", "AD", "AE", "BC", "BD", "BF", "CE", "CF", "DE", "DF", "EF");
-    static List<String> threePlane = List.of("ABC", "ACE", "AED", "ADB", "BCF", "BDF", "CEF", "DEF");
+    public static void main(String[] args) throws Exception {
 
-    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(br.readLine());
-        int[] numbers = Arrays.stream(br.readLine().split(" ")).mapToInt(Integer::valueOf).toArray();
-        long min1 = getMinNum(numbers);
-        long min2 = getMin2Num(numbers);
-        long min3 = getMin3Num(numbers);
-        if (n == 1) {
-            System.out.println(IntStream.of(numbers).sum() - min1);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+        N = Integer.parseInt(br.readLine());
+
+        num[1] = 5 * (N - 2) * (N - 2) + 4 * (N - 2);
+        num[2] = 8 * (N - 2) + 4;
+        num[3] = 4;
+
+        String[] sarr = br.readLine().split(" ");
+        for (int i = 0; i < 6; i++)
+            arr[i] = Integer.parseInt(sarr[i]);
+
+        if (N == 1) {
+            Arrays.sort(arr);
+            int sum = 0;
+            for (int i = 0; i < 5; i++) {
+                sum += arr[i];
+            }
+            bw.write(sum + "\n");
         }
+
         else {
-            long threePlanes = min3 * 4L;
-            long twoPlanes = min2 * (8L * n - 12);
-            long onePlane = 4 * min1 * (n - 2) * (n - 1) + min1 * (n - 2) * (n - 2);
-            System.out.println(threePlanes + twoPlanes + onePlane);
-        }
-    }
-
-    private static long getMin3Num(int[] numbers) {
-        long min = Long.MAX_VALUE;
-        for (String str: threePlane) {
-            long result = 0;
-            for (char c: str.toCharArray()) {
-                int index = c - 'A';
-                result += numbers[index];
+            long min = arr[0];
+            for (int i = 1; i < 6; i++) {
+                min = Math.min(min, arr[i]);
             }
-            min = Long.min(min, result);
-        }
-        return min;
-    }
+            res += num[1] * min;
 
-    private static long getMin2Num(int[] numbers) {
-        long min = Integer.MAX_VALUE;
-        for (String str: twoPlane) {
-            long result = 0;
-            for (char c: str.toCharArray()) {
-                int index = c - 'A';
-                result += numbers[index];
+            min = Long.MAX_VALUE;
+            for (int i = 0; i < 6; i++) {
+                for (int j = i + 1; j < 6; j++) {
+                    if (j + i != 5) {
+                        min = Math.min(min, arr[i] + arr[j]);
+                    }
+                }
             }
-            min = Long.min(min, result);
-        }
-        return min;
-    }
+            res += num[2] * min;
 
-    private static long getMinNum(int[] numbers) {
-        long min = Long.MAX_VALUE;
-        for (int n: numbers) {
-            min = Long.min(min, n);
+            int sum = 0;
+            for (int i = 0; i < 3; i++) {
+                sum += Math.min(arr[i], arr[5 - i]);
+            }
+            res += num[3] * sum;
+
+            bw.write(res + "\n");
         }
-        return min;
+        bw.flush();
+
     }
 
 }
