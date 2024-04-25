@@ -1,8 +1,6 @@
 package chapter9;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Q_3_RETRY {
 
@@ -17,7 +15,7 @@ public class Q_3_RETRY {
         Arrays.sort(beforeChars);
         Arrays.sort(afterChars);
         for (int i = 0; i < afterChars.length; i++) {
-            if (beforeChars[i] != afterChars[i]) return 0
+            if (beforeChars[i] != afterChars[i]) return 0;
         }
         return 1;
     }
